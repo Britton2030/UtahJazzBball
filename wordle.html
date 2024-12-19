@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jazz Wordle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            margin-top: 20px;
+            color: #002654;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(5, 50px);
+            gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+
+        .tile {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ddd;
+            font-size: 1.5em;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+        }
+
+        .correct {
+            background-color: #6aaa64; /* Green */
+            color: white;
+        }
+
+        .present {
+            background-color: #c9b458; /* Yellow */
+            color: white;
+        }
+
+        .absent {
+            background-color: #787c7e; /* Gray */
+            color: white;
+        }
+
+        #input-area {
+            margin-top: 20px;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jazz Wordle</h1>
+    <p>Guess the 5-letter word!</p>
+    <div id="board">
+        <!-- Dynamically generated tiles -->
+    </div>
+    <div id="input-area">
+        <input type="text" id="guess" maxlength="5" placeholder="Enter your guess" />
+        <button onclick="submitGuess()">Submit</button>
+    </div>
+    <p id="message"></p>
+
+    <script>
+        // List of Utah Jazz player names
+        const playerNames = ["burks", "allen", "brown"];
+        const solution = playerNames[new Date().getSeconds() % playerNames.length]; // Rotate between names
+        let currentRow = 0;
+
+        // Generate the board
+        const board = document.getElementById("board");
+        for (let i = 0; i < 6; i++) {
+            for (let j = 0; j < 5; j++) {
+                const tile = document.createElement("div");
+                tile.className = "tile";
+                tile.id = `tile-${i}-${j}`;
+                board.appendChild(tile);
+            }
+        }
+
+        // Handle guess submission
+        function submitGuess() {
+            const guess = document.getElementById("guess").value.toLowerCase();
+            if (guess.length !== 5) {
+                document.getElementById("message").textContent = "Please enter exactly 5 letters.";
+                return;
+            }
+
+            document.getElementById("message").textContent = "";
+
+            for (let i = 0; i < 5; i++) {
+                const tile = document.getElementById(`tile-${currentRow}-${i}`);
+                tile.textContent = guess[i];
+
+                if (guess[i] === solution[i]) {
+                    tile.classList.add("correct");
+                } else if (solution.includes(guess[i])) {
+                    tile.classList.add("present");
+                } else {
+                    tile.classList.add("absent");
+                }
+            }
+
+            if (guess === solution) {
+                document.getElementById("message").textContent = "Congratulations! You guessed it!";
+                document.getElementById("message").style.color = "green";
+                document.getElementById("guess").disabled = true;
+                return;
+            }
+
+            currentRow++;
+            document.getElementById("guess").value = "";
+
+            if (currentRow === 6) {
+                document.getElementById("message").textContent = `Game Over! The correct word was ${solution.toUpperCase()}.`;
+                document.getElementById("message").style.color = "red";
+                document.getElementById("guess").disabled = true;
+            }
+        }
+    </script>
+</body>
+</html>
